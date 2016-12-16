@@ -1,7 +1,9 @@
 package percolation;
-import edu.princeton.cs.algs4.*;
+import edu.princeton.cs.algs4.StdRandom;
+import edu.princeton.cs.algs4.StdStats;
+import edu.princeton.cs.algs4.WeightedQuickUnionUF;
+import edu.princeton.cs.algs4.Stopwatch;
 import java.util.*;
-import java.util.Random;
 
 
 public class Percolation {
@@ -9,7 +11,7 @@ public class Percolation {
 	private int[] status;
 	private int N;
 	private int row,col;
-	WeightedQuickUnionUF m;
+	private WeightedQuickUnionUF m;
 	public Percolation(int n)  	//初始化数组，每个格子表示符为自己的顺序
 	{
 
@@ -26,7 +28,7 @@ public class Percolation {
 		this.col = col;
 	}
 	
-	int setRC(int i)
+	private int setRC(int i)
 	{
 		if(i<0) return 0;
 		else	if(i>N-1) return N-1;
@@ -48,7 +50,7 @@ public class Percolation {
 		}
 		else return false;
 	}
-	public void display()
+	private void display()
 	{
 		System.out.println("###########root start############");
 		for(int i=0;i<N;i++)
@@ -87,7 +89,7 @@ public class Percolation {
 			{
 				if(tmp == this.m.find(N*(N-1)+j))
 				{
-					System.out.println("root is "+tmp);
+//					System.out.println("root is "+tmp);
 					return true;
 				}
 			}
@@ -95,40 +97,53 @@ public class Percolation {
 		return false;
 	}
 	
+	
+	
 	public static void main(String[] args) {
-		int n = 200;
-		int repeat = 100;
+		int n;
+		int repeat = 20;
 		int count_in = 0;
 		int count_out = 0;
 		Random random  = new Random();
-
-		for(int i=0;i<repeat;i++)
-		{	
-			Percolation a = new Percolation(n);
-			while(true)
-			{
-
-				int row= random.nextInt(n);
-				int col = random.nextInt(n);
-				if(a.isOpen(row, col))          
+		
+		
+		for(n=50;true; n+=n){
+			Stopwatch timer = new Stopwatch();
+			for(int i=0;i<repeat;i++)
+			{	
+				Percolation a = new Percolation(n);
+				while(true)
 				{
-					continue;
+	
+					int row= random.nextInt(n);
+					int col = random.nextInt(n);
+					if(a.isOpen(row, col))          
+					{
+						continue;
+					}
+					a.open(row, col);
+					count_in++;	
+								  
+					if(a.percolates())
+					{
+						break;
+					}
 				}
-				a.open(row, col);
-				count_in++;	
-							  
-				if(a.percolates())
-				{
-					break;
-				}
+				a.display();
+//				System.out.println("count_in:"+count_in);
+				count_out +=count_in;
+				count_in = 0;
+//				System.out.println("count_out:"+count_out);
+
 			}
-			a.display();
-			System.out.println("count_in:"+count_in);
-			count_out +=count_in;
-			count_in = 0;
-			System.out.println("count_out:"+count_out);
+			double time = timer.elapsedTime();
+			
+			System.out.println("n:"+n);
+			System.out.println((float)count_out/(n*n*repeat));
+			System.out.println("elapsedTime:"+time);
 		}
-		System.out.println("count_out:"+count_out);
-		System.out.println((float)count_out/(n*n*repeat));
+		
+//		System.out.println("count_out:"+count_out);
+//		System.out.println((float)count_out/(n*n*repeat));
 	}
 }
